@@ -1,1 +1,3 @@
-class Constants {}
+class Constants {
+    static const GOOGLE_MAPS_API_KEY = '';
+}
