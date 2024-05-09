@@ -126,7 +126,7 @@ class LoginView extends GetView<LoginController> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
-                            fontFamily: 'Inter',
+                            fontFamily: 'Gilroy',
                             fontWeight: FontWeight.w600,
                           ),
                         ),

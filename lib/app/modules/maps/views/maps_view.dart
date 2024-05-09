@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import '../controllers/maps_controller.dart';
 
 class MapsView extends GetView<MapsController> {
-  const MapsView({Key? key}) : super(key: key);
+  MapsView({super.key});
+  @override
+  final MapsController controller = Get.put(MapsController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(

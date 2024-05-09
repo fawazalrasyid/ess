@@ -61,7 +61,7 @@ class RegisterView extends GetView<RegisterController> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
-                              fontFamily: 'Inter',
+                              fontFamily: 'Gilroy',
                               fontWeight: FontWeight.w600,
                             ),
                           ),

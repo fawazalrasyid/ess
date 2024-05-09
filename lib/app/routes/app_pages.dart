@@ -64,12 +64,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.MAPS,
-      page: () => const MapsView(),
+      page: () => MapsView(),
       binding: MapsBinding(),
     ),
     GetPage(
       name: _Paths.SETTINGS,
-      page: () => const SettingsView(),
+      page: () => SettingsView(),
       binding: SettingsBinding(),
     ),
   ];

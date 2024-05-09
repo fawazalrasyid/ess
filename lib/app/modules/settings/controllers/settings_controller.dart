@@ -1,23 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-class SettingsController extends GetxController {
-  //TODO: Implement SettingsController
+import '../../../routes/app_pages.dart';
 
-  final count = 0.obs;
+class SettingsController extends GetxController {
+  FirebaseAuth auth = FirebaseAuth.instance;
+  User? user;
+
+  final isNotificationEnabled = false.obs;
+
   @override
   void onInit() {
+    user = auth.currentUser;
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void logout() {
+    FirebaseAuth.instance.signOut();
+    Get.offAllNamed(Routes.LOGIN);
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

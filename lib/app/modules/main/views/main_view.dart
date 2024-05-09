@@ -1,3 +1,5 @@
+import 'package:ess/app/modules/maps/views/maps_view.dart';
+import 'package:ess/app/modules/settings/views/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_icons/flutter_svg_icons.dart';
 
@@ -22,8 +24,8 @@ class MainView extends GetView<MainController> {
             index: controller.tabIndex.value,
             children: [
               HomeView(),
-              HomeView(),
-              HomeView(),
+              MapsView(),
+              SettingsView(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(

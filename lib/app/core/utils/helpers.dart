@@ -66,6 +66,6 @@ class Helpers {
 
   static String generatePhotoUrl(String name) {
     String formattedName = name.replaceAll(' ', '+');
-    return 'https://ui-avatars.com/api/?name=$formattedName&uppercase=true&background=random&size=512';
+    return 'https://ui-avatars.com/api/?name=$formattedName&uppercase=true&background=fff&size=512';
   }
 }
