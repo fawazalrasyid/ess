@@ -10,6 +10,8 @@ abstract class Routes {
   static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
   static const MAIN = _Paths.MAIN;
   static const HOME = _Paths.HOME;
+  static const MAPS = _Paths.MAPS;
+  static const SETTINGS = _Paths.SETTINGS;
 }
 
 abstract class _Paths {
@@ -21,4 +23,6 @@ abstract class _Paths {
   static const PRIVACY_POLICY = '/privacy-policy';
   static const MAIN = '/main';
   static const HOME = '/home';
+  static const MAPS = '/maps';
+  static const SETTINGS = '/settings';
 }

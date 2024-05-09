@@ -14,6 +14,18 @@ class Helpers {
     return random.nextInt(1001);
   }
 
+  static String greetings() {
+    DateTime now = DateTime.now();
+    int hour = now.hour;
+    if (hour < 12) {
+      return 'Selamat Pagi';
+    } else if (hour < 17) {
+      return 'Selamat Siang';
+    } else {
+      return 'Selamat Malam';
+    }
+  }
+
   static String formatDate(DateTime dateTime) {
     return DateFormat('EEEE, d MMMM yyyy').format(dateTime);
   }

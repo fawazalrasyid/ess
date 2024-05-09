@@ -20,7 +20,7 @@ class MainView extends GetView<MainController> {
         return Scaffold(
           body: IndexedStack(
             index: controller.tabIndex.value,
-            children: const [
+            children: [
               HomeView(),
               HomeView(),
               HomeView(),
@@ -39,17 +39,17 @@ class MainView extends GetView<MainController> {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(IconlyBold.home),
-                label: 'Beranda',
+                label: 'Home',
               ),
               BottomNavigationBarItem(
                 icon: SvgIcon(
                   icon: SvgIconData('assets/icons/fi-sr-map.svg'),
                 ),
-                label: 'Laporan',
+                label: 'Maps',
               ),
               BottomNavigationBarItem(
                 icon: Icon(IconlyBold.setting),
-                label: 'Profil',
+                label: 'Settings',
               ),
             ],
           ),

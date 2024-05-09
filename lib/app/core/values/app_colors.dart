@@ -45,6 +45,7 @@ abstract class AppColors {
   static const Color focusedTextFieldBorder = colorPrimary;
   static const Color textFieldHint = Color(0xFF717375);
 
+  static const Color iconPrimary = colorPrimary;
   static const Color iconDefault = Color(0xFFC3DAE9);
   static const Color icon = Color(0xFFD8DCDF);
   static const Color selectedIcon = colorPrimary;
