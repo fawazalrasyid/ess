@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/detail_mapping/bindings/detail_mapping_binding.dart';
+import '../modules/detail_mapping/views/detail_mapping_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -71,6 +73,11 @@ class AppPages {
       name: _Paths.SETTINGS,
       page: () => SettingsView(),
       binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_MAPPING,
+      page: () => const DetailMappingView(),
+      binding: DetailMappingBinding(),
     ),
   ];
 }

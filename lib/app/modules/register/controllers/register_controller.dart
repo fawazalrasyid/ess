@@ -34,18 +34,6 @@ class RegisterController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (kDebugMode) {
-      nameCtrl.text = 'Test 1';
-      addressCtrl.text = 'Jl. Raya Kedungkandang No. 1';
-      phoneNumberCtrl.text = '081234567890';
-      emailCtrl.text = 'test1@gmail.com';
-      instanceNameCtrl.text = 'PT. ESS';
-      instanceAddressCtrl.text = 'Jl. Raya Kedungkandang No. 1';
-      instanceEmailCtrl.text = 'ess@gmail.com';
-      passwordCtrl.text = '123456';
-      confirmPasswordCtrl.text = '123456';
-      isValidForm.value = true;
-    }
   }
 
   @override

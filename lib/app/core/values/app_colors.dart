@@ -5,7 +5,7 @@ abstract class AppColors {
   static const Color gradientPageBackground = Color(0xFFFFFFFF);
   static const Color statusBarColor = Color(0xFF38686A);
   static const Color appBarColor = Color(0xFF001C35);
-  static const Color appBarIconColor = Color(0xFFFFFFFF);
+  static const Color appBarIconColor = Color(0xFF092C4C);
   static const Color appBarTextColor = Color(0xFFFFFFFF);
   static const Color appBarTitleColor = Color(0xFFFFFFFF);
   static const Color appBarSubTitleColor = Color(0xFFFFFFFF);
@@ -46,6 +46,7 @@ abstract class AppColors {
   static const Color textFieldHint = Color(0xFF717375);
 
   static const Color iconPrimary = colorPrimary;
+  static const Color iconLightGreen = Color(0xFFE0F0B2);
   static const Color iconDefault = Color(0xFF92A4AF);
   static const Color icon = Color(0xFFD8DCDF);
   static const Color selectedIcon = colorPrimary;

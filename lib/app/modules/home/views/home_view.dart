@@ -43,7 +43,7 @@ class HomeView extends GetView<HomeController> {
                   ],
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 24),
               Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: AppValues.margin,

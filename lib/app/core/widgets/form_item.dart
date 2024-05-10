@@ -96,7 +96,10 @@ class _FormItemState extends State<FormItem> {
                     color: AppColors.iconDefault,
                   )
                 : widget.suffixIcon,
-            border: InputBorder.none,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
             hintText: widget.hintLabel,
             hintStyle: const TextStyle(
               color: Color(0xFF90A8BF),

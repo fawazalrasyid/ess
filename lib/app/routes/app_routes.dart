@@ -12,6 +12,7 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const MAPS = _Paths.MAPS;
   static const SETTINGS = _Paths.SETTINGS;
+  static const DETAIL_MAPPING = _Paths.DETAIL_MAPPING;
 }
 
 abstract class _Paths {
@@ -25,4 +26,5 @@ abstract class _Paths {
   static const HOME = '/home';
   static const MAPS = '/maps';
   static const SETTINGS = '/settings';
+  static const DETAIL_MAPPING = '/detail-mapping';
 }

@@ -22,11 +22,6 @@ class LoginController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (kDebugMode) {
-      emailCtrl.text = 'test@gmail.com';
-      passwordCtrl.text = 'test123';
-      isValidForm.value = true;
-    }
   }
 
   @override

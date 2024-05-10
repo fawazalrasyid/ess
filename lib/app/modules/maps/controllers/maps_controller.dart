@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ess/app/core/configs/constants.dart';
 import 'package:ess/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 
 class MapsController extends GetxController {
+  final isLoading = false.obs;
+
   GoogleMapController? googleMapController;
   final loc.Location location = loc.Location();
 
@@ -19,6 +23,8 @@ class MapsController extends GetxController {
   var polygons = <Polygon>{}.obs;
 
   final isCarbonVisible = false.obs;
+  final selectedAreaCarbonStock = 0.obs;
+  final selectedAreaBiomasa = 0.obs;
 
   @override
   void onInit() {
@@ -106,5 +112,23 @@ class MapsController extends GetxController {
   void clearAll() {
     markers.clear();
     polygons.clear();
+  }
+
+  void showCarbonStock(value) {
+    isLoading.value = true;
+
+    isCarbonVisible.value = value;
+
+    if (value) {
+      Timer(const Duration(seconds: 2), () async {
+        selectedAreaCarbonStock.value = 50;
+        selectedAreaBiomasa.value = 50;
+      });
+    } else {
+      selectedAreaCarbonStock.value = 0;
+      selectedAreaBiomasa.value = 0;
+    }
+
+    isLoading.value = false;
   }
 }
