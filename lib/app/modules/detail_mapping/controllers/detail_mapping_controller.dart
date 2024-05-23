@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:ess/app/core/values/app_colors.dart';
-import 'package:ess/app/core/widgets/custom_icons.dart';
 import 'package:ess/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

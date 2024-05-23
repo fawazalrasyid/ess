@@ -5,15 +5,14 @@ import 'package:ess/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart' as loc;
 
 class MapsController extends GetxController {
   final isLoading = false.obs;
 
   GoogleMapController? googleMapController;
-  final loc.Location location = loc.Location();
 
   final TextEditingController searchCtrl = TextEditingController();
 
@@ -34,24 +33,20 @@ class MapsController extends GetxController {
 
   void getCurrentLocation() async {
     bool serviceEnabled;
-    loc.PermissionStatus permissionGranted;
-    loc.LocationData locationData;
+    LocationPermission permission;
 
-    serviceEnabled = await location.serviceEnabled();
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       Fluttertoast.showToast(
         msg: "Location service is disabled. Please enable it to proceed.",
       );
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
+      return;
     }
 
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == loc.PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != loc.PermissionStatus.granted) {
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
         Fluttertoast.showToast(
           msg:
               "Location permission is denied. Please grant permission to proceed.",
@@ -60,12 +55,22 @@ class MapsController extends GetxController {
       }
     }
 
-    locationData = await location.getLocation();
-    if (locationData.latitude != null && locationData.longitude != null) {
-      updateCameraPosition(locationData.latitude!, locationData.longitude!);
-    } else {
-      Fluttertoast.showToast(msg: "Failed to get current location.");
+    if (permission == LocationPermission.deniedForever) {
+      Fluttertoast.showToast(
+        msg:
+            "Location permissions are permanently denied, we cannot request permissions.",
+      );
+      return;
     }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      updateCameraPosition(position.latitude, position.longitude);
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Failed to get current location: $e");
+    }
+
+    return;
   }
 
   void onMapCreated(GoogleMapController controller) {
