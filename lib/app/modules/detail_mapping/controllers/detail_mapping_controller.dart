@@ -9,6 +9,25 @@ import 'package:iconly/iconly.dart';
 class DetailMappingController extends GetxController {
   final isLoading = false.obs;
 
+  final selectedAreaImage = ''.obs;
+  final selectedAreaName = ''.obs;
+  final selectedAreaCarbonStock = ''.obs;
+  final selectedAreaBiomasa = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    getArgument();
+  }
+
+  void getArgument() {
+    final arguments = Get.arguments;
+    selectedAreaImage.value = arguments['image'];
+    selectedAreaName.value = arguments['name'];
+    selectedAreaCarbonStock.value = arguments['carbonStock'];
+    selectedAreaBiomasa.value = arguments['biomasa'];
+  }
+
   void saveData() {
     isLoading.value = true;
 

@@ -1,29 +1,48 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:ess/app/core/configs/constants.dart';
 import 'package:ess/app/core/values/app_colors.dart';
+import 'package:ess/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:flutter_google_maps_webservices/geocoding.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:image/image.dart' as img;
+
+import '../../../data/services/prediction_service.dart';
 
 class MapsController extends GetxController {
   final isLoading = false.obs;
 
-  GoogleMapController? googleMapController;
+  GoogleMapController? displayGoogleMapController;
+  GoogleMapController? snapshotGoogleMapController;
 
   final TextEditingController searchCtrl = TextEditingController();
 
   final places = GoogleMapsPlaces(apiKey: Constants.GOOGLE_MAPS_API_KEY);
+  final geocoding = GoogleMapsGeocoding(apiKey: Constants.GOOGLE_MAPS_API_KEY);
 
   var markers = <Marker>{}.obs;
   var polygons = <Polygon>{}.obs;
 
-  final isCarbonVisible = false.obs;
-  final selectedAreaCarbonStock = 0.obs;
-  final selectedAreaBiomasa = 0.obs;
+  final isAreaSelected = false.obs;
+  final isPredictedResultVisible = false.obs;
+  final isAlreadyPredicted = false.obs;
+
+  final selectedAreaImage = ''.obs;
+  final selectedAreaName = ''.obs;
+  final selectedAreaCarbonStock = ''.obs;
+  final selectedAreaBiomasa = ''.obs;
+
+  final ScreenshotController screenshotController = ScreenshotController();
+  final PredictionService predictionService = PredictionService();
 
   @override
   void onInit() {
@@ -73,8 +92,12 @@ class MapsController extends GetxController {
     return;
   }
 
+  void onSnapshotMapCreated(GoogleMapController controller) {
+    snapshotGoogleMapController = controller;
+  }
+
   void onMapCreated(GoogleMapController controller) {
-    googleMapController = controller;
+    displayGoogleMapController = controller;
   }
 
   void searchAndNavigate(String searchText) async {
@@ -90,16 +113,23 @@ class MapsController extends GetxController {
   }
 
   void updateCameraPosition(double latitude, double longitude) {
-    googleMapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: LatLng(latitude, longitude), zoom: 15),
-      ),
+    CameraPosition cameraPosition = CameraPosition(
+      target: LatLng(latitude, longitude),
+      zoom: 15,
     );
+
+    displayGoogleMapController
+        ?.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    snapshotGoogleMapController
+        ?.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   void addMarker(Marker marker) {
-    markers.add(marker);
-    updatePolygon();
+    if (!isAlreadyPredicted.value) {
+      markers.add(marker);
+      updatePolygon();
+      getSelectedAreaName(marker.position);
+    }
   }
 
   void updatePolygon() {
@@ -112,28 +142,119 @@ class MapsController extends GetxController {
     );
     polygons.clear();
     polygons.add(polygon);
+
+    if (markers.length == 4) {
+      isAreaSelected.value = true;
+      zoomToPolygon(polygon);
+    }
   }
 
-  void clearAll() {
+  void zoomToPolygon(Polygon polygon) async {
+    var bounds = _getPolygonBounds(polygon.points);
+    var cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 10);
+    await displayGoogleMapController?.animateCamera(cameraUpdate);
+    await snapshotGoogleMapController?.animateCamera(cameraUpdate);
+  }
+
+  LatLngBounds _getPolygonBounds(List<LatLng> points) {
+    double southWestLat =
+        points.map((point) => point.latitude).reduce((a, b) => a < b ? a : b);
+    double southWestLng =
+        points.map((point) => point.longitude).reduce((a, b) => a < b ? a : b);
+    double northEastLat =
+        points.map((point) => point.latitude).reduce((a, b) => a > b ? a : b);
+    double northEastLng =
+        points.map((point) => point.longitude).reduce((a, b) => a > b ? a : b);
+
+    return LatLngBounds(
+      southwest: LatLng(southWestLat, southWestLng),
+      northeast: LatLng(northEastLat, northEastLng),
+    );
+  }
+
+  Future<void> getSelectedAreaName(LatLng position) async {
+    var response = await geocoding.searchByLocation(
+      Location(lat: position.latitude, lng: position.longitude),
+    );
+    if (response.isOkay && response.results.isNotEmpty) {
+      selectedAreaName.value = response.results.first.formattedAddress ?? '';
+    } else {
+      selectedAreaName.value = 'Unknown area';
+    }
+  }
+
+  void clearSelectedArea() {
     markers.clear();
     polygons.clear();
+    isAreaSelected.value = false;
+    isPredictedResultVisible.value = false;
+    isAlreadyPredicted.value = false;
+    selectedAreaCarbonStock.value = '-';
+    selectedAreaBiomasa.value = '-';
   }
 
-  void showCarbonStock(value) {
-    isLoading.value = true;
-
-    isCarbonVisible.value = value;
+  void togglePredict(bool value) {
+    isPredictedResultVisible.value = value;
 
     if (value) {
-      Timer(const Duration(seconds: 2), () async {
-        selectedAreaCarbonStock.value = 50;
-        selectedAreaBiomasa.value = 50;
-      });
+      if (isAlreadyPredicted.value) {
+        isPredictedResultVisible.value = true;
+      } else if (isAreaSelected.value) {
+        predictSelectedArea();
+      } else {
+        isPredictedResultVisible.value = false;
+        Fluttertoast.showToast(msg: 'Pilih area terlebih dahulu');
+      }
     } else {
-      selectedAreaCarbonStock.value = 0;
-      selectedAreaBiomasa.value = 0;
+      isPredictedResultVisible.value = false;
+    }
+  }
+
+  Future<void> predictSelectedArea() async {
+    isLoading.value = true;
+
+    try {
+      snapshotGoogleMapController?.takeSnapshot().then(
+        (Uint8List? image) async {
+          if (image != null) {
+            final img.Image decodedImage = img.decodeImage(image)!;
+            final img.Image resizedImage = img.copyResize(
+              decodedImage,
+              width: 500,
+            );
+            final Uint8List compressedImage = Uint8List.fromList(
+              img.encodeJpg(resizedImage, quality: 100),
+            );
+
+            final directory = await getApplicationDocumentsDirectory();
+            final imagePath = File('${directory.path}/selected_area.png');
+            await imagePath.writeAsBytes(compressedImage);
+
+            final result = await predictionService.predictImage(imagePath.path);
+
+            selectedAreaImage.value = imagePath.path;
+            selectedAreaCarbonStock.value = result.predictedClass;
+            selectedAreaBiomasa.value = 'N/A';
+            isAlreadyPredicted.value = true;
+          } else {
+            Fluttertoast.showToast(msg: 'Terjadi kesalahan');
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('Failed to predict image: $e');
+      Fluttertoast.showToast(msg: 'Terjadi kesalahan');
     }
 
     isLoading.value = false;
+  }
+
+  void detailMapping() {
+    Get.toNamed(Routes.DETAIL_MAPPING, arguments: {
+      'image': selectedAreaImage.value,
+      'name': selectedAreaName.value,
+      'carbonStock': selectedAreaCarbonStock.value,
+      'biomasa': selectedAreaBiomasa.value,
+    });
   }
 }

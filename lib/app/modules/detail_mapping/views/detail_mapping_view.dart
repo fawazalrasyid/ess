@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ess/app/core/values/app_colors.dart';
 import 'package:ess/app/core/values/app_values.dart';
 import 'package:ess/app/core/widgets/custom_app_bar.dart';
@@ -5,7 +7,6 @@ import 'package:ess/app/core/widgets/custom_icons.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../controllers/detail_mapping_controller.dart';
 
@@ -71,23 +72,20 @@ class DetailMappingView extends GetView<DetailMappingController> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 Container(
                   height: 180,
                   margin: const EdgeInsets.symmetric(
                     horizontal: AppValues.margin,
                   ),
-                  child: const ClipRRect(
-                    borderRadius: BorderRadius.all(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(
                       Radius.circular(6),
                     ),
-                    child: GoogleMap(
-                      mapType: MapType.satellite,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(-7.003759, 107.647818),
-                        zoom: 15,
-                      ),
-                      myLocationButtonEnabled: false,
+                    child: Image.file(
+                      width: Get.width,
+                      File(controller.selectedAreaImage.value),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -134,119 +132,31 @@ class DetailMappingView extends GetView<DetailMappingController> {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Lokasi Daerah',
-                                style: TextStyle(
-                                  color: Color(0xFF92A4AF),
-                                  fontSize: 14,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w400,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Lokasi Daerah',
+                                  style: TextStyle(
+                                    color: Color(0xFF92A4AF),
+                                    fontSize: 14,
+                                    fontFamily: 'Gilroy',
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Bojongsoang',
-                                style: TextStyle(
-                                  color: Color(0xFF1D2E42),
-                                  fontSize: 16,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: ShapeDecoration(
-                              color: const Color(0xFF9ACD05),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2.81),
-                              ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  controller.selectedAreaName.value,
+                                  style: const TextStyle(
+                                    color: Color(0xFF1D2E42),
+                                    fontSize: 16,
+                                    fontFamily: 'Gilroy',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
                             ),
-                            child: const CustomIcon(
-                              icon: 'assets/icons/fi-sr-location-alt.svg',
-                              color: AppColors.iconLightGreen,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Longitude',
-                                style: TextStyle(
-                                  color: Color(0xFF92A4AF),
-                                  fontSize: 14,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                '34.052235',
-                                style: TextStyle(
-                                  color: Color(0xFF1D2E42),
-                                  fontSize: 16,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: ShapeDecoration(
-                              color: const Color(0xFF9ACD05),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2.81),
-                              ),
-                            ),
-                            child: const CustomIcon(
-                              icon: 'assets/icons/fi-sr-location-alt.svg',
-                              color: AppColors.iconLightGreen,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Latitude',
-                                style: TextStyle(
-                                  color: Color(0xFF92A4AF),
-                                  fontSize: 14,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                '-118.243683',
-                                style: TextStyle(
-                                  color: Color(0xFF1D2E42),
-                                  fontSize: 16,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )
-                            ],
                           ),
                         ],
                       ),
@@ -269,10 +179,10 @@ class DetailMappingView extends GetView<DetailMappingController> {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Jumlah Carbon',
                                 style: TextStyle(
                                   color: Color(0xFF92A4AF),
@@ -281,10 +191,10 @@ class DetailMappingView extends GetView<DetailMappingController> {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                '50 Kg',
-                                style: TextStyle(
+                                controller.selectedAreaCarbonStock.value,
+                                style: const TextStyle(
                                   color: Color(0xFF1D2E42),
                                   fontSize: 16,
                                   fontFamily: 'Gilroy',
@@ -314,10 +224,10 @@ class DetailMappingView extends GetView<DetailMappingController> {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Jumlah Biomasa',
                                 style: TextStyle(
                                   color: Color(0xFF92A4AF),
@@ -326,10 +236,10 @@ class DetailMappingView extends GetView<DetailMappingController> {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                '50 Kg',
-                                style: TextStyle(
+                                controller.selectedAreaBiomasa.value,
+                                style: const TextStyle(
                                   color: Color(0xFF1D2E42),
                                   fontSize: 16,
                                   fontFamily: 'Gilroy',

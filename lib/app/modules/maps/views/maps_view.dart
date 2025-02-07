@@ -1,5 +1,4 @@
 import 'package:ess/app/core/values/app_values.dart';
-import 'package:ess/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +13,7 @@ class MapsView extends GetView<MapsController> {
   MapsView({super.key});
   @override
   final MapsController controller = Get.put(MapsController());
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -21,17 +21,35 @@ class MapsView extends GetView<MapsController> {
         body: Column(
           children: [
             SizedBox(
-              height: Get.height * 0.6,
+              height: Get.height * 0.5,
               child: Stack(
                 children: [
+                  GoogleMap(
+                    onMapCreated: controller.onSnapshotMapCreated,
+                    mapType: MapType.satellite,
+                    initialCameraPosition: const CameraPosition(
+                      target: LatLng(-7.2575, 112.7521),
+                      zoom: 10,
+                    ),
+                    compassEnabled: false,
+                    zoomControlsEnabled: false,
+                    myLocationEnabled: false,
+                    myLocationButtonEnabled: false,
+                  ),
                   GoogleMap(
                     onMapCreated: controller.onMapCreated,
                     mapType: MapType.satellite,
                     initialCameraPosition: const CameraPosition(
-                      // target: LatLng(34.052235, -118.243683),
                       target: LatLng(-7.2575, 112.7521),
                       zoom: 10,
                     ),
+                    scrollGesturesEnabled: !controller.isAlreadyPredicted.value,
+                    rotateGesturesEnabled: !controller.isAlreadyPredicted.value,
+                    tiltGesturesEnabled: !controller.isAlreadyPredicted.value,
+                    compassEnabled: false,
+                    zoomControlsEnabled: false,
+                    myLocationEnabled: false,
+                    myLocationButtonEnabled: false,
                     markers: Set<Marker>.of(controller.markers),
                     polygons: Set<Polygon>.of(controller.polygons),
                     onTap: (LatLng location) {
@@ -74,14 +92,14 @@ class MapsView extends GetView<MapsController> {
                     ),
                   ),
                   Positioned(
-                    bottom: 80,
-                    right: 10,
+                    bottom: 16,
+                    right: 16,
                     child: FloatingActionButton(
-                      onPressed: controller.clearAll,
+                      onPressed: controller.clearSelectedArea,
                       backgroundColor: Colors.white,
-                      mini: true,
+                      mini: false,
                       child: const Icon(
-                        IconlyLight.delete,
+                        Icons.replay_sharp,
                         color: AppColors.iconPrimary,
                       ),
                     ),
@@ -100,7 +118,7 @@ class MapsView extends GetView<MapsController> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -132,166 +150,205 @@ class MapsView extends GetView<MapsController> {
                             height: 24,
                             child: CupertinoSwitch(
                               activeColor: AppColors.colorPrimary,
-                              value: controller.isCarbonVisible.value,
+                              value: controller.isPredictedResultVisible.value,
                               onChanged: (value) {
-                                controller.showCarbonStock(value);
+                                controller.togglePredict(value);
                               },
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      GestureDetector(
-                        onTap: () => controller.isCarbonVisible.value
-                            ? Get.toNamed(Routes.DETAIL_MAPPING)
-                            : null,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x99ECF3F6),
-                                blurRadius: 15,
-                                offset: Offset(0, 15),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 48,
-                                height: 48,
-                                padding: const EdgeInsets.all(10),
-                                decoration: const ShapeDecoration(
-                                  color: Color(0xFFF6F9FC),
-                                  shape: OvalBorder(
-                                    side: BorderSide(
-                                      width: 1,
-                                      strokeAlign:
-                                          BorderSide.strokeAlignOutside,
-                                      color: Color(0xFFECF4F8),
-                                    ),
-                                  ),
-                                ),
-                                child: Image.asset(
-                                  'assets/images/carbon_stock.png',
-                                ),
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Carbon Stock',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFF1D2E42),
-                                      fontSize: 16,
-                                      fontFamily: 'Gilroy',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    controller.selectedAreaCarbonStock.value > 0
-                                        ? '${controller.selectedAreaCarbonStock.value} Kg'
-                                        : controller.isCarbonVisible.value
-                                            ? 'Calculating...'
-                                            : '-',
-                                    style: const TextStyle(
-                                      color: Color(0xFF90A8BF),
-                                      fontSize: 14,
-                                      fontFamily: 'Gilroy',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: ShapeDecoration(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          shadows: const [
-                            BoxShadow(
-                              color: Color(0x99ECF3F6),
-                              blurRadius: 15,
-                              offset: Offset(0, 15),
-                              spreadRadius: 0,
-                            )
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              padding: const EdgeInsets.all(10),
-                              decoration: const ShapeDecoration(
-                                color: Color(0xFFF6F9FC),
-                                shape: OvalBorder(
-                                  side: BorderSide(
-                                    width: 1,
-                                    strokeAlign: BorderSide.strokeAlignOutside,
-                                    color: Color(0xFFECF4F8),
-                                  ),
-                                ),
-                              ),
-                              child: Image.asset(
-                                'assets/images/biomasa.png',
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Biomasa',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Color(0xFF1D2E42),
-                                    fontSize: 16,
-                                    fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  controller.selectedAreaBiomasa.value > 0
-                                      ? '${controller.selectedAreaBiomasa.value} Kg'
-                                      : controller.isCarbonVisible.value
-                                          ? 'Calculating...'
-                                          : '-',
-                                  style: const TextStyle(
-                                    color: Color(0xFF90A8BF),
-                                    fontSize: 14,
-                                    fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x99ECF3F6),
+                                  blurRadius: 15,
+                                  offset: Offset(0, 15),
+                                  spreadRadius: 0,
                                 )
                               ],
-                            )
-                          ],
-                        ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: const ShapeDecoration(
+                                    color: Color(0xFFF6F9FC),
+                                    shape: OvalBorder(
+                                      side: BorderSide(
+                                        width: 1,
+                                        strokeAlign:
+                                            BorderSide.strokeAlignOutside,
+                                        color: Color(0xFFECF4F8),
+                                      ),
+                                    ),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/carbon_stock.png',
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Carbon Stock',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xFF1D2E42),
+                                        fontSize: 16,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      controller.isPredictedResultVisible.value
+                                          ? controller.isLoading.value
+                                              ? 'Memprediksi jumlah carbon...'
+                                              : controller
+                                                  .selectedAreaCarbonStock.value
+                                          : '-',
+                                      style: const TextStyle(
+                                        color: Color(0xFF90A8BF),
+                                        fontSize: 14,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x99ECF3F6),
+                                  blurRadius: 15,
+                                  offset: Offset(0, 15),
+                                  spreadRadius: 0,
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: const ShapeDecoration(
+                                    color: Color(0xFFF6F9FC),
+                                    shape: OvalBorder(
+                                      side: BorderSide(
+                                        width: 1,
+                                        strokeAlign:
+                                            BorderSide.strokeAlignOutside,
+                                        color: Color(0xFFECF4F8),
+                                      ),
+                                    ),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/biomasa.png',
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Biomasa',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Color(0xFF1D2E42),
+                                        fontSize: 16,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      controller.isPredictedResultVisible.value
+                                          ? controller.isLoading.value
+                                              ? 'Memprediksi jumlah biomasa...'
+                                              : controller
+                                                  .selectedAreaBiomasa.value
+                                          : '-',
+                                      style: const TextStyle(
+                                        color: Color(0xFF90A8BF),
+                                        fontSize: 14,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: Get.width,
+                            child: ElevatedButton(
+                              onPressed: controller.isAlreadyPredicted.value
+                                  ? () => controller.detailMapping()
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.colorPrimary,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.fromLTRB(64, 16, 64, 16),
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: controller.isLoading.value
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Lihat Detail",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
